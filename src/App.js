@@ -2,23 +2,13 @@ import React from 'react';
 
 // Component -> Apollo Provider
 import { ApolloProvider } from 'react-apollo';
-// Convert -> GraphQL
-import gql from 'graphql-tag';
 // Query Handler
 import { Query } from 'react-apollo';
 // Client
 import client from './client';
 
-
-// Query -> GraphQL
-const ME = gql`
-  query me {
-    user(login: "iteachonudemy") {
-      name
-      avatarUrl
-    }
-  }
-`
+// GraphQL
+import { ME } from './graphql';
 
 
 // Component
