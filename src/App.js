@@ -1,17 +1,16 @@
 import React, { Component } from 'react';
 
-// Apollo Provider
-import { ApolloProvider } from 'react-apollo';
-// Query Handler
-import { Query } from 'react-apollo';
+// Apollo Provider and Mutation & Query Handler
+import { ApolloProvider, Mutation, Query } from 'react-apollo';
 // Query Client
 import client from './client';
 // GraphQL
-import { SEARCH_REPOSITORIES } from './graphql';
+import { ADD_STAR, SEARCH_REPOSITORIES } from './graphql';
 
 
+// Star Count Button Component
 // search > edges > node > stargazers > totalCount
-const StarCountButton = props => {
+const StarCountButtonComponent = props => {
   // node
   const node = props.node;
   // Is Starred ?
@@ -24,9 +23,33 @@ const StarCountButton = props => {
   const totalCountUnit = totalCount === 1 ? 'star' : 'stars'
   // Star Count Display
   const totalCountDisplay = `${ totalCount } ${ totalCountUnit }`;
-  // Star Count Button -> Display & Is Starred ?
+  // Star Status Component -> addStar ->
+  const StarStatusComponent = ({ addStar }) => {
+
+    return (
+      // Star Count Button -> Display & Is Starred ?
+      <button
+        // Add Star
+        onClick={
+          () => addStar(
+            {
+              // search > edges > node > id
+              variables: { input: { starrableId: node.id } }
+            }
+          )
+        }
+      >{ totalCountDisplay } | { viewerHasStarred ? 'starred' : '-' }</button>
+    );
+  };
+
   return (
-    <button>{ totalCountDisplay } | { viewerHasStarred ? 'starred' : '-' }</button>
+    // Component -> GraphQL (Mutation)
+    <Mutation mutation={ ADD_STAR }>
+      {
+        // Star Status Component -> addStar
+        addStar => <StarStatusComponent addStar={ addStar } />
+      }
+    </Mutation>
   );
 };
 
@@ -104,7 +127,7 @@ class App extends Component {
           <input value={ query } onChange={ this.handleChange } />
         </form>
 
-        {/* Component -> Query Handler & GraphQL */ }
+        {/* Component -> Query Handler & GraphQL (Query) */ }
         <Query
           query={ SEARCH_REPOSITORIES }
           variables={ { after, before, first, last, query } }
@@ -139,7 +162,7 @@ class App extends Component {
                           <li key={ node.id }>
                             <a href={ node.url } target="_blank" rel="noopener noreferrer">{ node.name }</a>
                             &nbsp;
-                            <StarCountButton node={ node } />
+                            <StarCountButtonComponent node={ node } />
                           </li>
                         );
                       })
