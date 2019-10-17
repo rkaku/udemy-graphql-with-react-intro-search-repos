@@ -11,7 +11,7 @@ import { SEARCH_REPOSITORIES } from './graphql';
 
 
 // Query Variables
-const VARIABLES = {
+const QUERY_VARIABLES = {
   after: null,
   before: null,
   first: 5,
@@ -25,15 +25,34 @@ class App extends Component {
 
   constructor(props) {
     super(props);
-    this.state = VARIABLES;
+    // Initialize
+    this.state = QUERY_VARIABLES;
+    // Bind
+    this.handleChange = this.handleChange.bind(this);
+  }
+
+  // Search Method
+  handleChange(event) {
+    this.setState(
+      {
+        ...QUERY_VARIABLES,
+        query: event.target.value
+      }
+    );
   }
 
   render() {
     const { after, before, first, last, query } = this.state;
+    console.log({ query });
 
     return (
       // Component -> Apollo Provider -> Query Client
       <ApolloProvider client={ client }>
+
+        {/* Search Form */ }
+        <form>
+          <input value={ query } onChange={ this.handleChange } />
+        </form>
 
         {/* Component -> Query Handler & GraphQL */ }
         <Query
