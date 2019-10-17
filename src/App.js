@@ -10,7 +10,19 @@ import client from './client';
 import { SEARCH_REPOSITORIES } from './graphql';
 
 
-// Dispay Number
+// search > edges > node > stargazers > totalCount
+const StarButton = props => {
+  // Star Total Count
+  const totalCount = props.node.stargazers.totalCount;
+  // Star Total Count Unit
+  const totalCountUnit = totalCount === 1 ? 'star' : 'stars'
+  // Star Total Count Display
+  const totalCountDisplay = `${ totalCount } ${ totalCountUnit }`;
+  return <button>{ totalCountDisplay }</button>;
+};
+
+
+// Display Number
 const PER_PAGE = 5;
 // Query Variables
 const QUERY_VARIABLES = {
@@ -102,21 +114,23 @@ class App extends Component {
               const search = data.search;
               // Repository Count
               const repositoryCount = search.repositoryCount;
-              // Repository Unit
-              const repositoryUnit = repositoryCount === 1 ? 'Repository' : 'Repositories';
-              // Result Title
-              const title = `GitHub Repositories Search Results -> ${ repositoryCount } ${ repositoryUnit }`
+              // Repository Count Unit
+              const repositoryCountUnit = repositoryCount === 1 ? 'Repository' : 'Repositories';
+              // Repository Count Display
+              const repositoryCountDisplay = `GitHub Repositories Search Results -> ${ repositoryCount } ${ repositoryCountUnit }`
               return (
                 <>
-                  <h2>{ title }</h2>
+                  <h2>{ repositoryCountDisplay }</h2>
                   <ul>
                     {
-                      // search > edges > node > id, name, url, viewerHasStarred, stargazers
                       search.edges.map(edge => {
+                        // search > edges > node > id, name, url, viewerHasStarred, stargazers
                         const node = edge.node;
                         return (
                           <li key={ node.id }>
                             <a href={ node.url } target="_blank" rel="noopener noreferrer">{ node.name }</a>
+                            &nbsp;
+                            <StarButton node={ node } />
                           </li>
                         );
                       })
