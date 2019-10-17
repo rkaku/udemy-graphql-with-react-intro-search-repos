@@ -1,16 +1,16 @@
 import React, { Component } from 'react';
 
-// Apollo Provider and Mutation & Query Handler
+// Component for Apollo Provider, Mutation & Query
 import { ApolloProvider, Mutation, Query } from 'react-apollo';
 // Query Client
 import client from './client';
 // GraphQL
-import { ADD_STAR, SEARCH_REPOSITORIES } from './graphql';
+import { ADD_STAR, REMOVE_STAR, SEARCH_REPOSITORIES } from './graphql';
 
 
-// Star Count Button Component
+// Star Count Component
 // search > edges > node > stargazers > totalCount
-const StarCountButtonComponent = props => {
+const StarCountComponent = props => {
   // node
   const node = props.node;
   // Is Starred ?
@@ -23,31 +23,38 @@ const StarCountButtonComponent = props => {
   const totalCountUnit = totalCount === 1 ? 'star' : 'stars'
   // Star Count Display
   const totalCountDisplay = `${ totalCount } ${ totalCountUnit }`;
-  // Star Status Component -> addStar ->
-  const StarStatusComponent = ({ addStar }) => {
 
+  // Star Status Component
+  const StarStatusComponent = ({ addOrRemoveStar }) => {
+    // Return Star Status Component
     return (
-      // Star Count Button -> Display & Is Starred ?
+      // Star Count Component
       <button
-        // Add Star
+        // On Click Method
         onClick={
-          () => addStar(
+          // Add or Remove Star Mutation
+          () => addOrRemoveStar(
             {
               // search > edges > node > id
               variables: { input: { starrableId: node.id } }
             }
           )
         }
-      >{ totalCountDisplay } | { viewerHasStarred ? 'starred' : '-' }</button>
+      >
+        {/* Star Count Display & Is Starred ? */ }
+        { totalCountDisplay } | { viewerHasStarred ? 'starred' : '-' }
+      </button>
     );
   };
 
+  // Return Star Count Component
   return (
-    // Component -> GraphQL (Mutation)
-    <Mutation mutation={ ADD_STAR }>
+    // Mutation Component -> GraphQL (Mutation)
+    <Mutation mutation={ viewerHasStarred ? REMOVE_STAR : ADD_STAR }>
       {
-        // Star Status Component -> addStar
-        addStar => <StarStatusComponent addStar={ addStar } />
+        // Mutation Handler
+        // Star Status Component -> addStar or removeStar
+        addOrRemoveStar => <StarStatusComponent addOrRemoveStar={ addOrRemoveStar } />
       }
     </Mutation>
   );
@@ -66,7 +73,7 @@ const QUERY_VARIABLES = {
 }
 
 
-// Component
+// App Component
 class App extends Component {
 
   constructor(props) {
@@ -91,6 +98,7 @@ class App extends Component {
   goPrevious(search) {
     this.setState(
       {
+        // Query Variables
         // search > pageInfo > endCursor, hasNextPage, hasPreviousPage, startCursor
         after: null,
         before: search.pageInfo.startCursor,
@@ -104,6 +112,7 @@ class App extends Component {
   goNext(search) {
     this.setState(
       {
+        // Query Variables
         // search > pageInfo > endCursor, hasNextPage, hasPreviousPage, startCursor
         after: search.pageInfo.endCursor,
         before: null,
@@ -118,8 +127,9 @@ class App extends Component {
     const { after, before, first, last, query } = this.state;
     console.log({ query });
 
+    // Return App Component
     return (
-      // Component -> Apollo Provider -> Query Client
+      // Apollo Provider Component -> Query Client
       <ApolloProvider client={ client }>
 
         {/* Search Form */ }
@@ -127,21 +137,25 @@ class App extends Component {
           <input value={ query } onChange={ this.handleChange } />
         </form>
 
-        {/* Component -> Query Handler & GraphQL (Query) */ }
+        {/* Query Component */ }
         <Query
+          // GraphQL (Query)
           query={ SEARCH_REPOSITORIES }
+          // Query Variables
           variables={ { after, before, first, last, query } }
         >
           {
+            // Query Handler -> Load, Error, Success(Data)
             ({ loading, error, data }) => {
 
-              // Loading
+              // Loading -> Return -> Loading
               if (loading) return 'Loading...';
 
-              // Error
+              // Error -> Return -> Error
               if (error) return `Error! ${ error }`;
 
-              // Success
+              // Success ->
+
               // Search Data
               const search = data.search;
               // Repository Count
@@ -150,25 +164,33 @@ class App extends Component {
               const repositoryCountUnit = repositoryCount === 1 ? 'Repository' : 'Repositories';
               // Repository Count Display
               const repositoryCountDisplay = `GitHub Repositories Search Results -> ${ repositoryCount } ${ repositoryCountUnit }`
+
+              // -> Return -> Success
               return (
                 <>
+                  {/* Repository Count Display */ }
                   <h2>{ repositoryCountDisplay }</h2>
                   <ul>
                     {
                       search.edges.map(edge => {
+                        // Node
                         // search > edges > node > id, name, url, viewerHasStarred, stargazers
                         const node = edge.node;
                         return (
+                          // List
                           <li key={ node.id }>
+                            {/* Name & Link */ }
                             <a href={ node.url } target="_blank" rel="noopener noreferrer">{ node.name }</a>
                             &nbsp;
-                            <StarCountButtonComponent node={ node } />
+                            {/* Star Count Component */ }
+                            <StarCountComponent node={ node } />
                           </li>
                         );
                       })
                     }
                   </ul>
                   {
+                    // Go to Previous Button
                     // search > pageInfo > endCursor, hasNextPage, hasPreviousPage, startCursor
                     search.pageInfo.hasPreviousPage === true ?
                       <button
@@ -181,6 +203,7 @@ class App extends Component {
                       null
                   }
                   {
+                    // Go to Next Button
                     // search > pageInfo > endCursor, hasNextPage, hasPreviousPage, startCursor
                     search.pageInfo.hasNextPage === true ?
                       <button
