@@ -10,11 +10,13 @@ import client from './client';
 import { SEARCH_REPOSITORIES } from './graphql';
 
 
+// Dispay Number
+const PER_PAGE = 5;
 // Query Variables
 const QUERY_VARIABLES = {
   after: null,
   before: null,
-  first: 5,
+  first: PER_PAGE,
   last: null,
   query: "GraphQL"
 }
@@ -29,7 +31,7 @@ class App extends Component {
     this.state = QUERY_VARIABLES;
     // Bind Method
     this.handleChange = this.handleChange.bind(this);
-  }
+  };
 
   // Search Method
   handleChange(event) {
@@ -39,7 +41,20 @@ class App extends Component {
         query: event.target.value
       }
     );
-  }
+  };
+
+  // Go to Next Page Method
+  goNext(search) {
+    this.setState(
+      {
+        // search > pageInfo > endCursor, hasNextPage, hasPreviousPage, startCursor
+        after: search.pageInfo.endCursor,
+        before: null,
+        first: PER_PAGE,
+        last: null
+      }
+    );
+  };
 
   render() {
     // Query Variables
@@ -94,6 +109,19 @@ class App extends Component {
                       })
                     }
                   </ul>
+
+                  {
+                    // search > pageInfo > endCursor, hasNextPage, hasPreviousPage, startCursor
+                    search.pageInfo.hasNextPage === true ?
+                      <button
+                        // Bind Method
+                        onClick={ this.goNext.bind(this, search) }
+                      >
+                        Next
+                      </button>
+                      :
+                      null
+                  }
                 </>
               );
             }

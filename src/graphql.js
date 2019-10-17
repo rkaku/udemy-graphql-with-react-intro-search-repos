@@ -39,3 +39,21 @@ export const SEARCH_REPOSITORIES = gql`
     }
   }
 `
+
+// search
+//   repositoryCount
+//   edges
+//     cursor
+//     node
+//       ...on Repository
+//       id
+//       name
+//       url
+//       viewerHasStarred
+//       stargazers
+//         totalCount
+//   pageInfo
+//     endCursor
+//     hasNextPage
+//     hasPreviousPage
+//     startCursor
