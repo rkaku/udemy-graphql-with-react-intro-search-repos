@@ -11,14 +11,23 @@ import { SEARCH_REPOSITORIES } from './graphql';
 
 
 // search > edges > node > stargazers > totalCount
-const StarButton = props => {
-  // Star Total Count
-  const totalCount = props.node.stargazers.totalCount;
-  // Star Total Count Unit
+const StarCountButton = props => {
+  // node
+  const node = props.node;
+  // Is Starred ?
+  // node > viewerHasStarred
+  const viewerHasStarred = node.viewerHasStarred;
+  // Star Count
+  //node > stargazers > totalCount
+  const totalCount = node.stargazers.totalCount;
+  // Star Count Unit
   const totalCountUnit = totalCount === 1 ? 'star' : 'stars'
-  // Star Total Count Display
+  // Star Count Display
   const totalCountDisplay = `${ totalCount } ${ totalCountUnit }`;
-  return <button>{ totalCountDisplay }</button>;
+  // Star Count Button -> Display & Is Starred ?
+  return (
+    <button>{ totalCountDisplay } | { viewerHasStarred ? 'starred' : '-' }</button>
+  );
 };
 
 
@@ -130,7 +139,7 @@ class App extends Component {
                           <li key={ node.id }>
                             <a href={ node.url } target="_blank" rel="noopener noreferrer">{ node.name }</a>
                             &nbsp;
-                            <StarButton node={ node } />
+                            <StarCountButton node={ node } />
                           </li>
                         );
                       })
