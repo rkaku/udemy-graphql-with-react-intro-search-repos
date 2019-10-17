@@ -25,9 +25,9 @@ class App extends Component {
 
   constructor(props) {
     super(props);
-    // Initialize
+    // Initialize Variables
     this.state = QUERY_VARIABLES;
-    // Bind
+    // Bind Method
     this.handleChange = this.handleChange.bind(this);
   }
 
@@ -42,6 +42,7 @@ class App extends Component {
   }
 
   render() {
+    // Query Variables
     const { after, before, first, last, query } = this.state;
     console.log({ query });
 
@@ -69,8 +70,15 @@ class App extends Component {
               if (error) return `Error! ${ error }`;
 
               // Success
-              console.log({ data });
-              return <div></div>
+              // Search Data
+              const search = data.search;
+              // Repository Count
+              const repositoryCount = search.repositoryCount;
+              // Repository Unit
+              const repositoryUnit = repositoryCount === 1 ? 'Repository' : 'Repositories';
+              // Result Title
+              const title = `GitHub Repositories Search Results -> ${ repositoryCount } ${ repositoryUnit }`
+              return <h2>{ title }</h2>
             }
           }
         </Query>
