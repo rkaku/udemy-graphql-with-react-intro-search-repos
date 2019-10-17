@@ -43,6 +43,19 @@ class App extends Component {
     );
   };
 
+  // Go to Previous Page Method
+  goPrevious(search) {
+    this.setState(
+      {
+        // search > pageInfo > endCursor, hasNextPage, hasPreviousPage, startCursor
+        after: null,
+        before: search.pageInfo.startCursor,
+        first: null,
+        last: PER_PAGE
+      }
+    );
+  };
+
   // Go to Next Page Method
   goNext(search) {
     this.setState(
@@ -109,7 +122,18 @@ class App extends Component {
                       })
                     }
                   </ul>
-
+                  {
+                    // search > pageInfo > endCursor, hasNextPage, hasPreviousPage, startCursor
+                    search.pageInfo.hasPreviousPage === true ?
+                      <button
+                        // Bind Method
+                        onClick={ this.goPrevious.bind(this, search) }
+                      >
+                        Previous
+                      </button>
+                      :
+                      null
+                  }
                   {
                     // search > pageInfo > endCursor, hasNextPage, hasPreviousPage, startCursor
                     search.pageInfo.hasNextPage === true ?
