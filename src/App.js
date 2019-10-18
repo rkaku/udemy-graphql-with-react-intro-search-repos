@@ -37,7 +37,51 @@ const StarCountComponent = props => {
             {
               // Query Variable
               // search > edges > node > id
-              variables: { input: { starrableId: node.id } }
+              variables: { input: { starrableId: node.id } },
+              // Update
+              update: (store, { data: { addStar, removeStar } }) => {
+                // Is Starrable ?
+                const { starrable } = addStar || removeStar;
+                // Read Local Data
+                const data = store.readQuery(
+                  {
+                    // GraphQL (Query)
+                    query: SEARCH_REPOSITORIES,
+                    // Query Variable
+                    // search > edges > node > id
+                    variables: { after, before, first, last, query }
+                  }
+                );
+
+                // edges
+                // search > edges > node > id
+                const edges = data.search.edges;
+                // Update Edges
+                const newEdges = edges.map(edge => {
+                  if (edge.node.id === node.id) {
+                    // Star Count
+                    //node > stargazers > totalCount
+                    const totalCount = edge.node.stargazers.totalCount;
+                    // +1 or -1
+                    const diff = starrable.viewerHasStarred ? +1 : -1;
+                    // New Star Count
+                    const newTotalCount = totalCount + diff;
+                    // Update Star Count
+                    edge.node.stargazers.totalCount = newTotalCount;
+                  }
+                  return edge;
+                })
+
+                // Update Data
+                data.search.edges = newEdges;
+                // Write Local Data
+                store.writeQuery(
+                  {
+                    query: SEARCH_REPOSITORIES,
+                    data
+                  }
+                );
+              }
             }
           )
         }
@@ -54,19 +98,23 @@ const StarCountComponent = props => {
     <Mutation
       // Mutation -> Add Star or Remove Star
       mutation={ viewerHasStarred ? REMOVE_STAR : ADD_STAR }
-      // Fetch Query
-      refetchQueries={ mutationResult => {
-        console.log(mutationResult);
-        return [
-          {
-            // GraphQL (Query)
-            query: SEARCH_REPOSITORIES,
-            // Query Variable
-            // search > edges > node > id
-            variables: { after, before, first, last, query }
-          }
-        ];
-      } }
+
+    /* Refetch Queries
+          // Fetch Query
+          refetchQueries={ mutationResult => {
+            console.log(mutationResult);
+            return [
+              {
+                // GraphQL (Query)
+                query: SEARCH_REPOSITORIES,
+                // Query Variable
+                // search > edges > node > id
+                variables: { after, before, first, last, query }
+              }
+            ];
+          } }
+    */
+
     >
       {
         // Mutation Handler
@@ -105,7 +153,9 @@ class App extends Component {
   handleChange(event) {
     this.setState(
       {
+        // Query Variables
         ...QUERY_VARIABLES,
+        // Search Key
         query: event.target.value
       }
     );
