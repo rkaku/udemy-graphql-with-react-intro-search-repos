@@ -11,8 +11,8 @@ import { ADD_STAR, REMOVE_STAR, SEARCH_REPOSITORIES } from './graphql';
 // Star Count Component
 // search > edges > node > stargazers > totalCount
 const StarCountComponent = props => {
-  // node
-  const node = props.node;
+  // node & Query Variable
+  const { node, after, before, first, last, query } = props;
   // Is Starred ?
   // node > viewerHasStarred
   const viewerHasStarred = node.viewerHasStarred;
@@ -32,9 +32,10 @@ const StarCountComponent = props => {
       <button
         // On Click Method
         onClick={
-          // Add or Remove Star Mutation
+          // Add Star or Remove Star
           () => addOrRemoveStar(
             {
+              // Query Variable
               // search > edges > node > id
               variables: { input: { starrableId: node.id } }
             }
@@ -50,7 +51,23 @@ const StarCountComponent = props => {
   // Return Star Count Component
   return (
     // Mutation Component -> GraphQL (Mutation)
-    <Mutation mutation={ viewerHasStarred ? REMOVE_STAR : ADD_STAR }>
+    <Mutation
+      // Mutation -> Add Star or Remove Star
+      mutation={ viewerHasStarred ? REMOVE_STAR : ADD_STAR }
+      // Fetch Query
+      refetchQueries={ mutationResult => {
+        console.log(mutationResult);
+        return [
+          {
+            // GraphQL (Query)
+            query: SEARCH_REPOSITORIES,
+            // Query Variable
+            // search > edges > node > id
+            variables: { after, before, first, last, query }
+          }
+        ];
+      } }
+    >
       {
         // Mutation Handler
         // Star Status Component -> addStar or removeStar
@@ -183,7 +200,7 @@ class App extends Component {
                             <a href={ node.url } target="_blank" rel="noopener noreferrer">{ node.name }</a>
                             &nbsp;
                             {/* Star Count Component */ }
-                            <StarCountComponent node={ node } />
+                            <StarCountComponent node={ node } { ...{ after, before, first, last, query } } />
                           </li>
                         );
                       })
