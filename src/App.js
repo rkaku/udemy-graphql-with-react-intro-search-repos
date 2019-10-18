@@ -134,7 +134,7 @@ const QUERY_VARIABLES = {
   before: null,
   first: PER_PAGE,
   last: null,
-  query: "GraphQL"
+  query: ''
 }
 
 
@@ -145,21 +145,43 @@ class App extends Component {
     super(props);
     // Initialize Variables
     this.state = QUERY_VARIABLES;
+
     // Bind Method
-    this.handleChange = this.handleChange.bind(this);
+    /* this.handleChange = this.handleChange.bind(this); */
+
+    // Ref Initialize
+    this.myRef = React.createRef();
+    // Bind Method
+    this.handleSubmit = this.handleSubmit.bind(this);
   };
 
   // Search Method
-  handleChange(event) {
+  handleSubmit(event) {
+    event.preventDefault();
+
+    // Update Query
     this.setState(
       {
-        // Query Variables
-        ...QUERY_VARIABLES,
         // Search Key
-        query: event.target.value
+        // this.myRef.current -> DOM <- event.target
+        query: this.myRef.current.value
       }
     );
   };
+
+  // Search Method
+  /*
+    handleChange(event) {
+      this.setState(
+        {
+          // Query Variables
+          ...QUERY_VARIABLES,
+          // Search Key
+          query: event.target.value
+        }
+      );
+    };
+  */
 
   // Go to Previous Page Method
   goPrevious(search) {
@@ -192,19 +214,21 @@ class App extends Component {
   render() {
     // Query Variables
     const { after, before, first, last, query } = this.state;
-    console.log({ query });
 
     // Return App Component
     return (
       // Apollo Provider Component -> Query Client
       <ApolloProvider client={ client }>
 
-        {/* Search Form */ }
-        <form>
-          <input value={ query } onChange={ this.handleChange } />
+        { /* Search Form */ }
+        <form onSubmit={ this.handleSubmit }>
+          { /* Input Form */ }
+          <input ref={ this.myRef } />
+          { /* Submit Button */ }
+          <input type="submit" value="submit" />
         </form>
 
-        {/* Query Component */ }
+        { /* Query Component */ }
         <Query
           // GraphQL (Query)
           query={ SEARCH_REPOSITORIES }
@@ -235,7 +259,7 @@ class App extends Component {
               // -> Return -> Success
               return (
                 <>
-                  {/* Repository Count Display */ }
+                  { /* Repository Count Display */ }
                   <h2>{ repositoryCountDisplay }</h2>
                   <ul>
                     {
