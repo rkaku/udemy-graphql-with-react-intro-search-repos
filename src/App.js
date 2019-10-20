@@ -1,10 +1,9 @@
 import React, { Component } from 'react';
-
-// Apollo Provider
+// Apollo Provider Component
 import { ApolloProvider } from 'react-apollo';
-// Query Handler
+// Query Component
 import { Query } from 'react-apollo';
-// Query Client
+// Client <- client.js <- Apollo Client
 import client from './client';
 // GraphQL
 import { SEARCH_REPOSITORIES } from './graphql';
@@ -20,27 +19,32 @@ const VARIABLES = {
 }
 
 
-// Component
+// App Component Class
 class App extends Component {
 
   constructor(props) {
     super(props);
+    // Initial Query Variables
     this.state = VARIABLES;
   }
 
   render() {
     const { after, before, first, last, query } = this.state;
 
+    // App Component
     return (
-      // Component -> Apollo Provider -> Query Client
+      // Apollo Provider -> Client
       <ApolloProvider client={ client }>
 
-        {/* Component -> Query Handler & GraphQL */ }
+        {/* Query Component */ }
         <Query
+          // GraphQL
           query={ SEARCH_REPOSITORIES }
+          // Query Variables
           variables={ { after, before, first, last, query } }
         >
           {
+            // Error Handling
             ({ loading, error, data }) => {
 
               // Loading
