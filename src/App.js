@@ -1,26 +1,29 @@
 import React from 'react';
 
-// Component -> Apollo Provider
+// Apollo Provider Component
 import { ApolloProvider } from 'react-apollo';
-// Query Handler
+// Query Component
 import { Query } from 'react-apollo';
-// Client
+// Client <- client.js <- Apollo Client
 import client from './client';
 
 // GraphQL
 import { ME } from './graphql';
 
 
-// Component
+// App Component Function
 function App() {
+
+  // App Component
   return (
-    // Component -> Apollo Provider
+    // Apollo Provider Component -> Client
     <ApolloProvider client={ client }>
       <div>Hello, GraphQL!</div>
 
-      {/* Query Handler */ }
+      {/* Query Component */ }
       <Query query={ ME }>
         {
+          // Error Handling
           ({ loading, error, data }) => {
 
             // Loading

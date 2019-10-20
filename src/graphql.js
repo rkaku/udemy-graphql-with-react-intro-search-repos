@@ -1,8 +1,8 @@
-// Convert -> GraphQL
+// GraphQL
 import gql from 'graphql-tag';
 
 
-// Query -> GraphQL
+// GraphQL
 export const ME = gql`
   query me {
     user(login: "iteachonudemy") {
