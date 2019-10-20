@@ -1,10 +1,10 @@
-import React, { Component } from 'react';
+import React, { useState } from 'react';
 
-// Apollo Provider
+// Apollo Provider Component
 import { ApolloProvider } from 'react-apollo';
-// Query Handler
+// Query Component
 import { Query } from 'react-apollo';
-// Query Client
+// Client <- client.js <- Apollo Client
 import client from './client';
 // GraphQL
 import { SEARCH_REPOSITORIES } from './graphql';
@@ -20,63 +20,58 @@ const QUERY_VARIABLES = {
 }
 
 
-// Component
-class App extends Component {
+// App Component Function
+const App = () => {
 
-  constructor(props) {
-    super(props);
-    // Initialize
-    this.state = QUERY_VARIABLES;
-    // Bind
-    this.handleChange = this.handleChange.bind(this);
-  }
+  const [state, setState] = useState(QUERY_VARIABLES);
 
   // Search Method
-  handleChange(event) {
-    this.setState(
+  const handleChange = (event) => {
+    // Bind State
+    setState(
       {
+        // Remaining Variables
         ...QUERY_VARIABLES,
+        // Update Search Word
         query: event.target.value
       }
     );
   }
 
-  render() {
-    const { after, before, first, last, query } = this.state;
-    console.log({ query });
+  const { after, before, first, last, query } = state;
 
-    return (
-      // Component -> Apollo Provider -> Query Client
-      <ApolloProvider client={ client }>
+  // App Component
+  return (
+    // Apollo Provider Component -> Client
+    <ApolloProvider client={ client }>
 
-        {/* Search Form */ }
-        <form>
-          <input value={ query } onChange={ this.handleChange } />
-        </form>
+      {/* Search Form */ }
+      <form>
+        <input value={ query } onChange={ handleChange } />
+      </form>
 
-        {/* Component -> Query Handler & GraphQL */ }
-        <Query
-          query={ SEARCH_REPOSITORIES }
-          variables={ { after, before, first, last, query } }
-        >
-          {
-            ({ loading, error, data }) => {
+      {/* Query Component */ }
+      <Query
+        query={ SEARCH_REPOSITORIES }
+        variables={ { after, before, first, last, query } }
+      >
+        {
+          ({ loading, error, data }) => {
 
-              // Loading
-              if (loading) return 'Loading...';
+            // Loading
+            if (loading) return 'Loading...';
 
-              // Error
-              if (error) return `Error! ${ error }`;
+            // Error
+            if (error) return `Error! ${ error }`;
 
-              // Success
-              console.log({ data });
-              return <div></div>
-            }
+            // Success
+            console.log({ data });
+            return <div></div>
           }
-        </Query>
-      </ApolloProvider>
-    );
-  };
+        }
+      </Query>
+    </ApolloProvider>
+  );
 }
 
 
