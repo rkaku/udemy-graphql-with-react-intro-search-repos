@@ -1,13 +1,16 @@
 import React from 'react';
 
-// Apollo
-import { ApolloProvider } from 'react-apollo';
+// GraphQL
 import gql from 'graphql-tag';
-import { Query } from 'react-apollo';
+// Apollo Provider Component
+import { ApolloProvider } from 'react-apollo';
+// Client <- client.js <- Apollo Client
 import client from './client';
+// Query Component
+import { Query } from 'react-apollo';
 
 
-// Query
+// GraphQL
 const ME = gql`
   query me {
     user(login: "iteachonudemy") {
@@ -18,14 +21,19 @@ const ME = gql`
 `
 
 
-// Component
+// App Component Function
 function App() {
+
+  // App Component
   return (
+    // Apollo Provider -> Client
     <ApolloProvider client={ client }>
       <div>Hello, GraphQL!</div>
 
+      {/* Query Component -> GraphQL */ }
       <Query query={ ME }>
         {
+          // Error Handling
           ({ loading, error, data }) => {
 
             // Loading
@@ -34,7 +42,7 @@ function App() {
             // Error
             if (error) return `Error! ${ error }`;
 
-            // Success
+            // Success -> Name
             return <div>{ data.user.name }</div>
           }
         }
