@@ -6,6 +6,7 @@ import client from './client';
 // GraphQL
 import { SEARCH_REPOSITORIES } from './graphql';
 
+
 // App Component Function
 const App = () => {
 
@@ -18,12 +19,12 @@ const App = () => {
     first: PER_PAGE,
     last: null,
     query: "GraphQL"
-  }
+  };
 
+  // useState <- Query Variables
   const [state, setState] = useState(QUERY_VARIABLES);
-  console.log({ state })
 
-  // Search Method
+  // Input OnChange Method
   const handleChange = (event) => {
     setState(
       {
@@ -33,7 +34,7 @@ const App = () => {
     );
   };
 
-  // Go to Next Page Method
+  // Go to Next Button Method
   const goNext = (search) => {
     setState(
       {
@@ -50,8 +51,8 @@ const App = () => {
   // SearchResults Component Function
   const SearchResults = () => {
 
-    // useQuery
-    const { loading, error, data } = useQuery(SEARCH_REPOSITORIES);
+    // useQuery <- GraphQL, Query Variables
+    const { loading, error, data } = useQuery(SEARCH_REPOSITORIES, { variables: state });
 
     // Loading
     if (loading) return 'Loading...';
@@ -76,6 +77,7 @@ const App = () => {
         <ul>
           {
             // search > edges > node > id, name, url, viewerHasStarred, stargazers
+            // Search Results
             search.edges.map(edge => {
               const node = edge.node;
               return (
@@ -90,8 +92,9 @@ const App = () => {
         {
           // search > pageInfo > endCursor, hasNextPage, hasPreviousPage, startCursor
           search.pageInfo.hasNextPage === true ?
+            // Next Button
             <button
-              onClick={ goNext(search) }
+              onClick={ () => { goNext(search) } }
             >
               Next
             </button>
@@ -104,17 +107,17 @@ const App = () => {
 
   // App Component
   return (
-    // Apollo Provider -> Client
+    // Apollo Provider Component
     <ApolloProvider client={ client }>
       {/* Search Form */ }
       <form>
-        { console.log(state.query) }
         <input value={ state.query } onChange={ handleChange } />
       </form>
+      {/* Search Results Component */ }
       <SearchResults />
     </ApolloProvider>
   );
-}
+};
 
 
 export default App;
