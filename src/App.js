@@ -8,7 +8,7 @@ import client from './client';
 import { ADD_STAR, SEARCH_REPOSITORIES } from './graphql';
 
 
-// Star Count Button Component
+// Star Count Component Function
 // search > edges > node > stargazers > totalCount
 const StarCountButtonComponent = props => {
   // node
@@ -23,9 +23,9 @@ const StarCountButtonComponent = props => {
   const totalCountUnit = totalCount === 1 ? 'star' : 'stars'
   // Star Count Display
   const totalCountDisplay = `${ totalCount } ${ totalCountUnit }`;
-  // Star Status Component -> addStar ->
-  const StarStatusComponent = ({ addStar }) => {
-
+  // Star Status Component Function -> addStar ->
+  const StarStatus = ({ addStar }) => {
+    // StarStatusComponent
     return (
       // Star Count Button -> Display & Is Starred ?
       <button
@@ -42,12 +42,13 @@ const StarCountButtonComponent = props => {
     );
   };
 
+  // Star Count Component
   return (
     // Component -> GraphQL (Mutation)
     <Mutation mutation={ ADD_STAR }>
       {
         // Star Status Component -> addStar
-        addStar => <StarStatusComponent addStar={ addStar } />
+        addStar => <StarStatus addStar={ addStar } />
       }
     </Mutation>
   );
