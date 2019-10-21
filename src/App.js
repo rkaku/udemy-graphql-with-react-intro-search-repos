@@ -47,8 +47,10 @@ const App = () => {
     );
   };
 
-  // SearchResults Component
+  // SearchResults Component Function
   const SearchResults = () => {
+
+    // useQuery
     const { loading, error, data } = useQuery(SEARCH_REPOSITORIES);
 
     // Loading
@@ -67,7 +69,7 @@ const App = () => {
     // Result Title
     const title = `GitHub Repositories Search Results -> ${ repositoryCount } ${ repositoryUnit }`
 
-    // App Component
+    // SearchResults Component
     return (
       <>
         <h2>{ title }</h2>
@@ -100,6 +102,7 @@ const App = () => {
     );
   };
 
+  // App Component
   return (
     // Apollo Provider -> Client
     <ApolloProvider client={ client }>
