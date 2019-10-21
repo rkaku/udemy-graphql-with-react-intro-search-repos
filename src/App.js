@@ -1,135 +1,116 @@
-import React, { Component } from 'react';
-
+import React, { useState } from 'react';
 // Apollo Provider
-import { ApolloProvider } from 'react-apollo';
-// Query Handler
-import { Query } from 'react-apollo';
+import { ApolloProvider, useQuery } from '@apollo/react-hooks';
 // Query Client
 import client from './client';
 // GraphQL
 import { SEARCH_REPOSITORIES } from './graphql';
 
+// App Component Function
+const App = () => {
 
-// Dispay Number
-const PER_PAGE = 5;
-// Query Variables
-const QUERY_VARIABLES = {
-  after: null,
-  before: null,
-  first: PER_PAGE,
-  last: null,
-  query: "GraphQL"
-}
+  // Display Number
+  const PER_PAGE = 5;
+  // Query Variables
+  const QUERY_VARIABLES = {
+    after: null,
+    before: null,
+    first: PER_PAGE,
+    last: null,
+    query: "GraphQL"
+  }
 
-
-// Component
-class App extends Component {
-
-  constructor(props) {
-    super(props);
-    // Initialize Variables
-    this.state = QUERY_VARIABLES;
-    // Bind Method
-    this.handleChange = this.handleChange.bind(this);
-  };
+  const [state, setState] = useState(QUERY_VARIABLES);
+  console.log({ state })
 
   // Search Method
-  handleChange(event) {
-    this.setState(
+  const handleChange = (event) => {
+    setState(
       {
-        ...QUERY_VARIABLES,
+        ...state,
         query: event.target.value
       }
     );
   };
 
   // Go to Next Page Method
-  goNext(search) {
-    this.setState(
+  const goNext = (search) => {
+    setState(
       {
+        ...state,
         // search > pageInfo > endCursor, hasNextPage, hasPreviousPage, startCursor
         after: search.pageInfo.endCursor,
         before: null,
         first: PER_PAGE,
-        last: null
+        last: null,
       }
     );
   };
 
-  render() {
-    // Query Variables
-    const { after, before, first, last, query } = this.state;
-    console.log({ query });
+  // SearchResults Component
+  const SearchResults = () => {
+    const { loading, error, data } = useQuery(SEARCH_REPOSITORIES);
 
+    // Loading
+    if (loading) return 'Loading...';
+
+    // Error
+    if (error) return `Error! ${ error }`;
+
+    // Success
+    // Search Data
+    const search = data.search;
+    // Repository Count
+    const repositoryCount = search.repositoryCount;
+    // Repository Unit
+    const repositoryUnit = repositoryCount === 1 ? 'Repository' : 'Repositories';
+    // Result Title
+    const title = `GitHub Repositories Search Results -> ${ repositoryCount } ${ repositoryUnit }`
+
+    // App Component
     return (
-      // Component -> Apollo Provider -> Query Client
-      <ApolloProvider client={ client }>
-
-        {/* Search Form */ }
-        <form>
-          <input value={ query } onChange={ this.handleChange } />
-        </form>
-
-        {/* Component -> Query Handler & GraphQL */ }
-        <Query
-          query={ SEARCH_REPOSITORIES }
-          variables={ { after, before, first, last, query } }
-        >
+      <>
+        <h2>{ title }</h2>
+        <ul>
           {
-            ({ loading, error, data }) => {
-
-              // Loading
-              if (loading) return 'Loading...';
-
-              // Error
-              if (error) return `Error! ${ error }`;
-
-              // Success
-              // Search Data
-              const search = data.search;
-              // Repository Count
-              const repositoryCount = search.repositoryCount;
-              // Repository Unit
-              const repositoryUnit = repositoryCount === 1 ? 'Repository' : 'Repositories';
-              // Result Title
-              const title = `GitHub Repositories Search Results -> ${ repositoryCount } ${ repositoryUnit }`
+            // search > edges > node > id, name, url, viewerHasStarred, stargazers
+            search.edges.map(edge => {
+              const node = edge.node;
               return (
-                <>
-                  <h2>{ title }</h2>
-                  <ul>
-                    {
-                      // search > edges > node > id, name, url, viewerHasStarred, stargazers
-                      search.edges.map(edge => {
-                        const node = edge.node;
-                        return (
-                          <li key={ node.id }>
-                            <a href={ node.url } target="_blank" rel="noopener noreferrer">{ node.name }</a>
-                          </li>
-                        );
-                      })
-                    }
-                  </ul>
-
-                  {
-                    // search > pageInfo > endCursor, hasNextPage, hasPreviousPage, startCursor
-                    search.pageInfo.hasNextPage === true ?
-                      <button
-                        // Bind Method
-                        onClick={ this.goNext.bind(this, search) }
-                      >
-                        Next
-                      </button>
-                      :
-                      null
-                  }
-                </>
+                <li key={ node.id }>
+                  <a href={ node.url } target="_blank" rel="noopener noreferrer">{ node.name }</a>
+                </li>
               );
-            }
+            })
           }
-        </Query>
-      </ApolloProvider>
+        </ul>
+
+        {
+          // search > pageInfo > endCursor, hasNextPage, hasPreviousPage, startCursor
+          search.pageInfo.hasNextPage === true ?
+            <button
+              onClick={ goNext(search) }
+            >
+              Next
+            </button>
+            :
+            null
+        }
+      </>
     );
   };
+
+  return (
+    // Apollo Provider -> Client
+    <ApolloProvider client={ client }>
+      {/* Search Form */ }
+      <form>
+        { console.log(state.query) }
+        <input value={ state.query } onChange={ handleChange } />
+      </form>
+      <SearchResults />
+    </ApolloProvider>
+  );
 }
 
 
