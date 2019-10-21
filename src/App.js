@@ -10,6 +10,7 @@ import client from './client';
 import { SEARCH_REPOSITORIES } from './graphql';
 
 
+// StarCountButton Component Function
 // search > edges > node > stargazers > totalCount
 const StarCountButton = props => {
   // node
@@ -139,6 +140,7 @@ class App extends Component {
                           <li key={ node.id }>
                             <a href={ node.url } target="_blank" rel="noopener noreferrer">{ node.name }</a>
                             &nbsp;
+                            {/* StarCountButton Component */}
                             <StarCountButton node={ node } />
                           </li>
                         );
