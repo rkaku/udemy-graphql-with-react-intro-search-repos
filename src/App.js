@@ -1,10 +1,9 @@
-import React, { Component } from 'react';
-
-// Apollo Provider
+import React, { useState } from 'react';
+// Apollo Provider Component
 import { ApolloProvider } from 'react-apollo';
-// Query Handler
+// Query Component
 import { Query } from 'react-apollo';
-// Query Client
+// Client <- client.js <- Apollo Client
 import client from './client';
 // GraphQL
 import { SEARCH_REPOSITORIES } from './graphql';
@@ -20,20 +19,15 @@ const QUERY_VARIABLES = {
 }
 
 
-// Component
-class App extends Component {
+// App Component Function
+const App = () => {
 
-  constructor(props) {
-    super(props);
-    // Initialize Variables
-    this.state = QUERY_VARIABLES;
-    // Bind Method
-    this.handleChange = this.handleChange.bind(this);
-  }
+  // useState
+  const [state, setState] = useState(QUERY_VARIABLES)
 
   // Search Method
-  handleChange(event) {
-    this.setState(
+  const handleChange = (event) => {
+    setState(
       {
         ...QUERY_VARIABLES,
         query: event.target.value
@@ -41,50 +35,52 @@ class App extends Component {
     );
   }
 
-  render() {
-    // Query Variables
-    const { after, before, first, last, query } = this.state;
-    console.log({ query });
+  // Query Variables
+  const { after, before, first, last, query } = state;
+  console.log({ query });
 
-    return (
-      // Component -> Apollo Provider -> Query Client
-      <ApolloProvider client={ client }>
+  // App Component
+  return (
+    // Apollo Provider Component -> Client
+    <ApolloProvider client={ client }>
 
-        {/* Search Form */ }
-        <form>
-          <input value={ query } onChange={ this.handleChange } />
-        </form>
+      {/* Search Form */ }
+      <form>
+        <input value={ query } onChange={ handleChange } />
+      </form>
 
-        {/* Component -> Query Handler & GraphQL */ }
-        <Query
-          query={ SEARCH_REPOSITORIES }
-          variables={ { after, before, first, last, query } }
-        >
-          {
-            ({ loading, error, data }) => {
+      {/* Component -> Query Handler & GraphQL */ }
+      <Query
+        query={ SEARCH_REPOSITORIES }
+        variables={ { after, before, first, last, query } }
+      >
+        {
+          ({ loading, error, data }) => {
 
-              // Loading
-              if (loading) return 'Loading...';
+            // Loading
+            if (loading) return 'Loading...';
 
-              // Error
-              if (error) return `Error! ${ error }`;
+            // Error
+            if (error) return `Error! ${ error }`;
 
-              // Success
-              // Search Data
-              const search = data.search;
-              // Repository Count
-              const repositoryCount = search.repositoryCount;
-              // Repository Unit
-              const repositoryUnit = repositoryCount === 1 ? 'Repository' : 'Repositories';
-              // Result Title
-              const title = `GitHub Repositories Search Results -> ${ repositoryCount } ${ repositoryUnit }`
-              return <h2>{ title }</h2>
-            }
+            // Success
+            // Data -> Search
+            const search = data.search;
+            // Search -> Repository Count
+            const repositoryCount = search.repositoryCount;
+            // Repository Unit
+            const repositoryUnit =
+              // Singular || Multiple
+              repositoryCount === 1 ? 'Repository' : 'Repositories';
+            // Result Title
+            const title = `GitHub Repositories Search Results -> ${ repositoryCount } ${ repositoryUnit }`
+            // Display Title
+            return <h2>{ title }</h2>
           }
-        </Query>
-      </ApolloProvider>
-    );
-  };
+        }
+      </Query>
+    </ApolloProvider>
+  );
 }
 
 
