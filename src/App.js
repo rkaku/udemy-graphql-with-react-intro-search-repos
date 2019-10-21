@@ -94,7 +94,7 @@ const App = () => {
           search.pageInfo.hasNextPage === true ?
             // Next Button
             <button
-              onClick={ () => { goNext(search) } }
+              onClick={ goNext.bind(this, search) }
             >
               Next
             </button>
