@@ -6,6 +6,7 @@ import reducer from '../reducers';
 // GraphQL
 import {
   ADD_STAR,
+  REMOVE_STAR,
   SEARCH_REPOSITORIES
 } from '../graphql';
 // Actions
@@ -64,7 +65,6 @@ const App = () => {
 
   // Go to Next Page Button Method
   const goNext = (search) => {
-    // event.preventDefault();
     // setState(
     //   {
     //     ...state,
@@ -77,6 +77,7 @@ const App = () => {
     // );
     dispatch({
       type: GO_NEXT,
+      // search > pageInfo > endCursor, hasNextPage, hasPreviousPage, startCursor
       after: search.pageInfo.endCursor,
       before: null,
       first: PER_PAGE,
@@ -89,6 +90,7 @@ const App = () => {
 
     // search > edges > node > id, name, url, viewerHasStarred, stargazers
     const node = props.node;
+    const id = node.id;
     // viewerHasStarred
     const viewerHasStarred = node.viewerHasStarred;
     const viewerHasStarredDisplay = viewerHasStarred ? 'starred' : '-';
@@ -98,13 +100,19 @@ const App = () => {
     const totalCountDisplay = `${ totalCount } ${ totalCountUnit }`;
 
     // useMutation
-    // const [addStar, { loading, error, data }] = useMutation(ADD_STAR);
+    const [addStar, { loading, error, data }] = useMutation(ADD_STAR);
 
     return (
       <>
-        <button>{ totalCountDisplay } | { viewerHasStarredDisplay }</button>
-        {/* { loading && <p>Loading...</p> } */ }
-        {/* { error && <p>Error! Please try again</p> } */ }
+        <button
+          onClick={ () => addStar(
+            { variables: { input: { starrableId: id } } }
+          ) }
+        >
+          { totalCountDisplay } | { viewerHasStarredDisplay }
+          { loading && <p>Loading...</p> }
+          { error && <p>Error! Please try again</p> }
+        </button>
       </>
     );
   };
