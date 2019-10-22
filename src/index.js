@@ -1,7 +1,7 @@
 import React from 'react';
 import { render } from 'react-dom';
 import './index.css';
-import App from './App';
+import App from './components/App';
 // Apollo Provider
 import { ApolloProvider } from '@apollo/react-hooks';
 // Query Client

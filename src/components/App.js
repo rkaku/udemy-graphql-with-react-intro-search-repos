@@ -1,16 +1,16 @@
 import React, { useReducer } from 'react';
-import reducer from './reducers';
+import reducer from '../reducers';
 // useQuery
 import { useQuery } from '@apollo/react-hooks';
 // Query Client
 // import client from './client';
 // GraphQL
-import { SEARCH_REPOSITORIES } from './graphql';
+import { SEARCH_REPOSITORIES } from '../graphql';
 import {
   HANDLE_CHANGE,
   GO_NEXT,
   GO_PREVIOUS
-} from './actions'
+} from '../actions'
 
 
 // App Component Function
