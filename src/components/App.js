@@ -1,8 +1,10 @@
-import React, { useReducer } from 'react';
+import React, { useContext, useReducer } from 'react';
 // useQuery
 import { useQuery, useMutation } from '@apollo/react-hooks';
 // Reducers
 import reducer from '../reducers';
+// SearchQuery Context Provider
+import SearchQueryContext from '../contexts/SearchQuery';
 // GraphQL
 import {
   ADD_STAR,
@@ -86,10 +88,11 @@ const App = () => {
   };
 
   // Star Count Component Function
-  const StarCount = (props) => {
+  const StarCount = () => {
 
+    const { node } = useContext(SearchQueryContext);
     // search > edges > node > id, name, url, viewerHasStarred, stargazers
-    const node = props.node;
+    // const node = props.node;
     const id = node.id;
     // viewerHasStarred
     const viewerHasStarred = node.viewerHasStarred;
@@ -102,7 +105,17 @@ const App = () => {
     // useMutation
     const [addOrRemoveStar, { loading, error, data }] = useMutation(
       // Add or Remove Star
-      viewerHasStarred ? REMOVE_STAR : ADD_STAR
+      viewerHasStarred ? REMOVE_STAR : ADD_STAR,
+      {
+        refetchQueries: mutationResult => {
+          return [
+            {
+              query: SEARCH_REPOSITORIES,
+              variables: state.searchReducer
+            }
+          ];
+        }
+      }
     );
     // const [removeStar, { loading, error, data }] = useMutation(REMOVE_STAR);
 
@@ -125,7 +138,11 @@ const App = () => {
   const SearchQuery = () => {
 
     // useQuery <- GraphQL, Query Variables
-    const { loading, error, data } = useQuery(SEARCH_REPOSITORIES, { variables: state.searchReducer });
+    const { loading, error, data, refetch, networkStatus } =
+      useQuery(SEARCH_REPOSITORIES, { variables: state.searchReducer, notifyOnNetworkStatusChange: true });
+
+    // Refetch
+    if (networkStatus === 4) return 'Refetching :)'
 
     // Loading
     if (loading) return 'Loading...';
@@ -134,7 +151,7 @@ const App = () => {
     if (error) return `Error! ${ error }`;
 
     // Success
-    // Search Data
+    // Data > search > edges > node > id, name, url, viewerHasStarred, stargazers
     const search = data.search;
     // Repository Count
     const repositoryCount = search.repositoryCount;
@@ -154,11 +171,14 @@ const App = () => {
             search.edges.map(edge => {
               const node = edge.node;
               return (
-                <li key={ node.id }>
-                  <a href={ node.url } target="_blank" rel="noopener noreferrer">{ node.name }</a>
-                  &nbsp;
-                  <StarCount node={ node } />
-                </li>
+                <SearchQueryContext.Provider value={ { node } } key={ node.id }>
+                  <li>
+                    <a href={ node.url } target="_blank" rel="noopener noreferrer">{ node.name }</a>
+                    &nbsp;
+                    {/* <StarCount node={ node } /> */ }
+                    <StarCount />
+                  </li>
+                </SearchQueryContext.Provider>
               );
             })
           }
@@ -172,9 +192,14 @@ const App = () => {
               onClick={ goPrevious.bind(this, search) }
             >
               Previous
-            </button>
+                  </button>
             :
             null
+        }
+
+        {
+          // Refetch :)
+          <button onClick={ () => refetch() }>Refetch :)</button>
         }
 
         {
@@ -185,7 +210,7 @@ const App = () => {
               onClick={ goNext.bind(this, search) }
             >
               Next
-            </button>
+                  </button>
             :
             null
         }
