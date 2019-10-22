@@ -1,9 +1,9 @@
 import React, { useReducer } from 'react';
 import reducer from './reducers';
-// Apollo Provider
-import { ApolloProvider, useQuery } from '@apollo/react-hooks';
+// useQuery
+import { useQuery } from '@apollo/react-hooks';
 // Query Client
-import client from './client';
+// import client from './client';
 // GraphQL
 import { SEARCH_REPOSITORIES } from './graphql';
 import {
@@ -127,15 +127,17 @@ const App = () => {
 
   // App Component
   return (
-    // Apollo Provider Component
-    <ApolloProvider client={ client }>
+    <>
+      {/* Apollo Provider Component */ }
+      {/* <ApolloProvider client={ client }> */ }
       {/* Search Form */ }
       <form>
         <input value={ state.query } onChange={ handleChange } />
       </form>
       {/* Search Results Component */ }
       <SearchResults />
-    </ApolloProvider>
+      {/* </ApolloProvider> */ }
+    </>
   );
 };
 
