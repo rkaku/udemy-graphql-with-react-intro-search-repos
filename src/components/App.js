@@ -1,11 +1,11 @@
 import React, { useReducer } from 'react';
-import reducer from '../reducers';
 // useQuery
 import { useQuery } from '@apollo/react-hooks';
-// Query Client
-// import client from './client';
+// Reducers
+import reducer from '../reducers';
 // GraphQL
 import { SEARCH_REPOSITORIES } from '../graphql';
+// Actions
 import {
   HANDLE_CHANGE,
   GO_NEXT,
@@ -70,8 +70,8 @@ const App = () => {
     });
   };
 
-  // SearchResults Component Function
-  const SearchResults = () => {
+  // SearchQuery Component Function
+  const SearchQuery = () => {
 
     // useQuery <- GraphQL, Query Variables
     const { loading, error, data } = useQuery(SEARCH_REPOSITORIES, { variables: state.searchReducer });
@@ -92,7 +92,7 @@ const App = () => {
     // Result Title
     const title = `GitHub Repositories Search Results -> ${ repositoryCount } ${ repositoryUnit }`
 
-    // SearchResults Component
+    // SearchQuery Component
     return (
       <>
         <h2>{ title }</h2>
@@ -130,15 +130,12 @@ const App = () => {
   // App Component
   return (
     <>
-      {/* Apollo Provider Component */ }
-      {/* <ApolloProvider client={ client }> */ }
       {/* Search Form */ }
       <form>
         <input value={ state.searchReducer.query } onChange={ handleChange } />
       </form>
-      {/* Search Results Component */ }
-      <SearchResults />
-      {/* </ApolloProvider> */ }
+      {/* Search Query Component */ }
+      <SearchQuery />
     </>
   );
 };
