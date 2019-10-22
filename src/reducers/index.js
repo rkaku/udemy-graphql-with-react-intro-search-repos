@@ -1,4 +1,4 @@
 import { combineReducers } from 'redux';
-import search from './search';
+import searchReducer from './search';
 
-export default combineReducers({ search });
+export default combineReducers({ searchReducer });
