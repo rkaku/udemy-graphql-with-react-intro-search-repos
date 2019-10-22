@@ -48,7 +48,18 @@ const App = () => {
     });
   };
 
-  // Go to Next Button Method
+  // Go to Previous Page Button Method
+  const goPrevious = (search) => {
+    dispatch({
+      type: GO_PREVIOUS,
+      after: null,
+      before: search.pageInfo.startCursor,
+      first: null,
+      last: PER_PAGE
+    });
+  };
+
+  // Go to Next Page Button Method
   const goNext = (search) => {
     // event.preventDefault();
     // setState(
@@ -98,8 +109,8 @@ const App = () => {
         <h2>{ title }</h2>
         <ul>
           {
+            // Search Results Display
             // search > edges > node > id, name, url, viewerHasStarred, stargazers
-            // Search Results
             search.edges.map(edge => {
               const node = edge.node;
               return (
@@ -112,9 +123,22 @@ const App = () => {
         </ul>
 
         {
+          // Previous Button
+          // search > pageInfo > endCursor, hasNextPage, hasPreviousPage, startCursor
+          search.pageInfo.hasPreviousPage === true ?
+            <button
+              onClick={ goPrevious.bind(this, search) }
+            >
+              Previous
+            </button>
+            :
+            null
+        }
+
+        {
+          // Next Button
           // search > pageInfo > endCursor, hasNextPage, hasPreviousPage, startCursor
           search.pageInfo.hasNextPage === true ?
-            // Next Button
             <button
               onClick={ goNext.bind(this, search) }
             >

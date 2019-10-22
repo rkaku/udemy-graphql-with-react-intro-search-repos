@@ -24,6 +24,13 @@ const searchReducer = (state = {}, action) => {
       return state;
 
     case GO_PREVIOUS:
+      state = {
+        ...state,
+        after: null,
+        before: action.before,
+        first: null,
+        last: action.last,
+      };
       return state;
 
     default:
