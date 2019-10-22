@@ -87,8 +87,13 @@ const App = () => {
   // Star Count Component Function
   const StarCount = (props) => {
 
+    // search > edges > node > id, name, url, viewerHasStarred, stargazers
+    const node = props.node;
+    // viewerHasStarred
+    const viewerHasStarred = node.viewerHasStarred;
+    const viewerHasStarredDisplay = viewerHasStarred ? 'starred' : '-';
     // Star Total Count
-    const totalCount = props.node.stargazers.totalCount;
+    const totalCount = node.stargazers.totalCount;
     const totalCountUnit = totalCount === 1 ? 'star' : 'stars';
     const totalCountDisplay = `${ totalCount } ${ totalCountUnit }`;
 
@@ -97,9 +102,9 @@ const App = () => {
 
     return (
       <>
-        <button>{ totalCountDisplay }</button>
-        {/* { loading && <p>Loading...</p> } */}
-        {/* { error && <p>Error! Please try again</p> } */}
+        <button>{ totalCountDisplay } | { viewerHasStarredDisplay }</button>
+        {/* { loading && <p>Loading...</p> } */ }
+        {/* { error && <p>Error! Please try again</p> } */ }
       </>
     );
   };
