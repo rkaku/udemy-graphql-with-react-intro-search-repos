@@ -20,11 +20,13 @@ const App = () => {
   const PER_PAGE = 5;
   // Query Variables
   const QUERY_VARIABLES = {
-    after: null,
-    before: null,
-    first: PER_PAGE,
-    last: null,
-    query: "GraphQL"
+    search: {
+      after: null,
+      before: null,
+      first: PER_PAGE,
+      last: null,
+      query: "GraphQL"
+    }
   };
 
   const [state, dispatch] = useReducer(reducer, QUERY_VARIABLES);
@@ -72,7 +74,7 @@ const App = () => {
   const SearchResults = () => {
 
     // useQuery <- GraphQL, Query Variables
-    const { loading, error, data } = useQuery(SEARCH_REPOSITORIES, { variables: state });
+    const { loading, error, data } = useQuery(SEARCH_REPOSITORIES, { variables: state.search });
 
     // Loading
     if (loading) return 'Loading...';
@@ -132,7 +134,7 @@ const App = () => {
       {/* <ApolloProvider client={ client }> */ }
       {/* Search Form */ }
       <form>
-        <input value={ state.query } onChange={ handleChange } />
+        <input value={ state.search.query } onChange={ handleChange } />
       </form>
       {/* Search Results Component */ }
       <SearchResults />
