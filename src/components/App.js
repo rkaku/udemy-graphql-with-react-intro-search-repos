@@ -35,19 +35,11 @@ const App = () => {
     }
   };
 
+  // useReducer
   const [state, dispatch] = useReducer(reducer, QUERY_VARIABLES);
-
-  // useState <- Query Variables
-  // const [query, setQuery] = useState(state.query);
 
   // Input OnChange Method
   const handleChange = (event) => {
-    // setState(
-    //   {
-    //     ...state,
-    //     query: event.target.value
-    //   }
-    // );
     dispatch({
       type: HANDLE_CHANGE,
       query: event.target.value
@@ -59,6 +51,7 @@ const App = () => {
     dispatch({
       type: GO_PREVIOUS,
       after: null,
+      // search > pageInfo > endCursor, hasNextPage, hasPreviousPage, startCursor
       before: search.pageInfo.startCursor,
       first: null,
       last: PER_PAGE
@@ -67,16 +60,6 @@ const App = () => {
 
   // Go to Next Page Button Method
   const goNext = (search) => {
-    // setState(
-    //   {
-    //     ...state,
-    //     // search > pageInfo > endCursor, hasNextPage, hasPreviousPage, startCursor
-    //     after: search.pageInfo.endCursor,
-    //     before: null,
-    //     first: PER_PAGE,
-    //     last: null,
-    //   }
-    // );
     dispatch({
       type: GO_NEXT,
       // search > pageInfo > endCursor, hasNextPage, hasPreviousPage, startCursor
@@ -87,12 +70,12 @@ const App = () => {
     });
   };
 
-  // Star Count Component Function
-  const StarCount = () => {
+  // Star Count & Status Component Function
+  const StarCountAndStatus = () => {
 
+    // <- useContext <- SearchQuery Context <- node
     const { node } = useContext(SearchQueryContext);
     // search > edges > node > id, name, url, viewerHasStarred, stargazers
-    // const node = props.node;
     const id = node.id;
     // viewerHasStarred
     const viewerHasStarred = node.viewerHasStarred;
@@ -117,15 +100,17 @@ const App = () => {
         }
       }
     );
-    // const [removeStar, { loading, error, data }] = useMutation(REMOVE_STAR);
 
+    // Star Count & Status Component
     return (
       <>
+        {/* Add or Remove Star Button */ }
         <button
           onClick={ () => addOrRemoveStar(
             { variables: { input: { starrableId: id } } }
           ) }
         >
+          {/* Star Count & Status Display */ }
           { totalCountDisplay } | { viewerHasStarredDisplay }
           { loading && <p>Loading...</p> }
           { error && <p>Error! Please try again</p> }
@@ -148,7 +133,7 @@ const App = () => {
     if (loading) return 'Loading...';
 
     // Error
-    if (error) return `Error! ${ error }`;
+    if (error) return `Error :( ${ error }`;
 
     // Success
     // Data > search > edges > node > id, name, url, viewerHasStarred, stargazers
@@ -157,7 +142,7 @@ const App = () => {
     const repositoryCount = search.repositoryCount;
     // Repository Unit
     const repositoryUnit = repositoryCount === 1 ? 'Repository' : 'Repositories';
-    // Result Title
+    // Repository Count Display
     const title = `GitHub Repositories Search Results -> ${ repositoryCount } ${ repositoryUnit }`
 
     // SearchQuery Component
@@ -170,13 +155,16 @@ const App = () => {
             // search > edges > node > id, name, url, viewerHasStarred, stargazers
             search.edges.map(edge => {
               const node = edge.node;
+              // Map -> Search Result Display
               return (
+                // SearchQuery Context Provider <- node
                 <SearchQueryContext.Provider value={ { node } } key={ node.id }>
+                  {/* Name & Link */ }
                   <li>
                     <a href={ node.url } target="_blank" rel="noopener noreferrer">{ node.name }</a>
                     &nbsp;
-                    {/* <StarCount node={ node } /> */ }
-                    <StarCount />
+                    {/* Star Count & Status Component */ }
+                    <StarCountAndStatus />
                   </li>
                 </SearchQueryContext.Provider>
               );
