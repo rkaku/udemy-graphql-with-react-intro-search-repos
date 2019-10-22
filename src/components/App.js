@@ -100,12 +100,16 @@ const App = () => {
     const totalCountDisplay = `${ totalCount } ${ totalCountUnit }`;
 
     // useMutation
-    const [addStar, { loading, error, data }] = useMutation(ADD_STAR);
+    const [addOrRemoveStar, { loading, error, data }] = useMutation(
+      // Add or Remove Star
+      viewerHasStarred ? REMOVE_STAR : ADD_STAR
+    );
+    // const [removeStar, { loading, error, data }] = useMutation(REMOVE_STAR);
 
     return (
       <>
         <button
-          onClick={ () => addStar(
+          onClick={ () => addOrRemoveStar(
             { variables: { input: { starrableId: id } } }
           ) }
         >

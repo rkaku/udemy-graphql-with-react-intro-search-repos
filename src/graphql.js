@@ -60,3 +60,15 @@ export const ADD_STAR = gql`
     }
   }
 `
+
+export const REMOVE_STAR = gql`
+  mutation removeStar($input: RemoveStarInput!) {
+    removeStar(input: $input) {
+      clientMutationId
+      starrable {
+        id
+        viewerHasStarred
+      }
+    }
+  }
+`
