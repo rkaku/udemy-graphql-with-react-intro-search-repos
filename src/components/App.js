@@ -1,10 +1,13 @@
 import React, { useReducer } from 'react';
 // useQuery
-import { useQuery } from '@apollo/react-hooks';
+import { useQuery, useMutation } from '@apollo/react-hooks';
 // Reducers
 import reducer from '../reducers';
 // GraphQL
-import { SEARCH_REPOSITORIES } from '../graphql';
+import {
+  ADD_STAR,
+  SEARCH_REPOSITORIES
+} from '../graphql';
 // Actions
 import {
   HANDLE_CHANGE,
@@ -81,6 +84,26 @@ const App = () => {
     });
   };
 
+  // Star Count Component Function
+  const StarCount = (props) => {
+
+    // Star Total Count
+    const totalCount = props.node.stargazers.totalCount;
+    const totalCountUnit = totalCount === 1 ? 'star' : 'stars';
+    const totalCountDisplay = `${ totalCount } ${ totalCountUnit }`;
+
+    // useMutation
+    // const [addStar, { loading, error, data }] = useMutation(ADD_STAR);
+
+    return (
+      <>
+        <button>{ totalCountDisplay }</button>
+        {/* { loading && <p>Loading...</p> } */}
+        {/* { error && <p>Error! Please try again</p> } */}
+      </>
+    );
+  };
+
   // SearchQuery Component Function
   const SearchQuery = () => {
 
@@ -116,6 +139,8 @@ const App = () => {
               return (
                 <li key={ node.id }>
                   <a href={ node.url } target="_blank" rel="noopener noreferrer">{ node.name }</a>
+                  &nbsp;
+                  <StarCount node={ node } />
                 </li>
               );
             })
