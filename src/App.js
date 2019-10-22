@@ -1,10 +1,16 @@
-import React, { useState } from 'react';
+import React, { useReducer } from 'react';
+import reducer from './reducers';
 // Apollo Provider
 import { ApolloProvider, useQuery } from '@apollo/react-hooks';
 // Query Client
 import client from './client';
 // GraphQL
 import { SEARCH_REPOSITORIES } from './graphql';
+import {
+  HANDLE_CHANGE,
+  GO_NEXT,
+  GO_PREVIOUS
+} from './actions'
 
 
 // App Component Function
@@ -21,31 +27,45 @@ const App = () => {
     query: "GraphQL"
   };
 
+  const [state, dispatch] = useReducer(reducer, QUERY_VARIABLES);
+
   // useState <- Query Variables
-  const [state, setState] = useState(QUERY_VARIABLES);
+  // const [query, setQuery] = useState(state.query);
 
   // Input OnChange Method
   const handleChange = (event) => {
-    setState(
-      {
-        ...state,
-        query: event.target.value
-      }
-    );
+    // setState(
+    //   {
+    //     ...state,
+    //     query: event.target.value
+    //   }
+    // );
+    dispatch({
+      type: HANDLE_CHANGE,
+      query: event.target.value
+    });
   };
 
   // Go to Next Button Method
   const goNext = (search) => {
-    setState(
-      {
-        ...state,
-        // search > pageInfo > endCursor, hasNextPage, hasPreviousPage, startCursor
-        after: search.pageInfo.endCursor,
-        before: null,
-        first: PER_PAGE,
-        last: null,
-      }
-    );
+    // event.preventDefault();
+    // setState(
+    //   {
+    //     ...state,
+    //     // search > pageInfo > endCursor, hasNextPage, hasPreviousPage, startCursor
+    //     after: search.pageInfo.endCursor,
+    //     before: null,
+    //     first: PER_PAGE,
+    //     last: null,
+    //   }
+    // );
+    dispatch({
+      type: GO_NEXT,
+      after: search.pageInfo.endCursor,
+      before: null,
+      first: PER_PAGE,
+      last: null
+    });
   };
 
   // SearchResults Component Function
