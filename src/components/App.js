@@ -1,4 +1,4 @@
-import React, { useContext, useReducer } from 'react';
+import React, { useContext, useReducer, useRef } from 'react';
 // useQuery
 import { useQuery, useMutation } from '@apollo/react-hooks';
 // Reducers
@@ -13,7 +13,7 @@ import {
 } from '../graphql';
 // Actions
 import {
-  HANDLE_CHANGE,
+  HANDLE_SUBMIT,
   GO_NEXT,
   GO_PREVIOUS
 } from '../actions'
@@ -31,20 +31,29 @@ const App = () => {
       before: null,
       first: PER_PAGE,
       last: null,
-      query: "GraphQL"
+      query: ""
     }
   };
 
-  // useReducer
+  // useReducer <- Reducers & Query Variables
   const [state, dispatch] = useReducer(reducer, QUERY_VARIABLES);
 
-  // Input OnChange Method
-  const handleChange = (event) => {
+  // Submit Method
+  const handleSubmit = (event) => {
+    event.preventDefault();
     dispatch({
-      type: HANDLE_CHANGE,
-      query: event.target.value
+      type: HANDLE_SUBMIT,
+      query: input.current.value
     });
   };
+
+  // Input OnChange Method
+  // const handleChange = (event) => {
+  //   dispatch({
+  //     type: HANDLE_CHANGE,
+  //     query: event.target.value
+  //   });
+  // };
 
   // Go to Previous Page Button Method
   const goPrevious = (search) => {
@@ -234,12 +243,17 @@ const App = () => {
     );
   };
 
+  // input <- Ref
+  const input = useRef(null);
+
   // App Component
   return (
     <>
       {/* Search Form */ }
-      <form>
-        <input value={ state.searchReducer.query } onChange={ handleChange } />
+      <form onSubmit={ handleSubmit }>
+        <input ref={ input } />
+        <input type="submit" value="Submit" />
+        {/* <input value={ state.searchReducer.query } onChange={ handleChange } /> */ }
       </form>
       {/* Search Query Component */ }
       <SearchQuery />

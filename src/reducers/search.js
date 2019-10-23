@@ -1,5 +1,5 @@
 import {
-  HANDLE_CHANGE,
+  HANDLE_SUBMIT,
   GO_NEXT,
   GO_PREVIOUS
 } from '../actions'
@@ -9,7 +9,7 @@ const searchReducer = (state = {}, action) => {
 
   switch (action.type) {
 
-    case HANDLE_CHANGE:
+    case HANDLE_SUBMIT:
       state = { ...state, query: action.query };
       return state;
 
