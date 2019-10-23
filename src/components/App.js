@@ -70,8 +70,8 @@ const App = () => {
     });
   };
 
-  // Star Count & Status Component Function
-  const StarCountAndStatus = () => {
+  // Star Mutation Component Function
+  const StarMutation = () => {
 
     // <- useContext <- SearchQuery Context <- node
     const { node } = useContext(SearchQueryContext);
@@ -90,22 +90,50 @@ const App = () => {
       // Add or Remove Star
       viewerHasStarred ? REMOVE_STAR : ADD_STAR,
       {
-        refetchQueries: mutationResult => {
-          return [
-            {
-              query: SEARCH_REPOSITORIES,
-              variables: state.searchReducer
+        update(cache, { data: { addStar, removeStar } }) {
+
+          // Starrable Response
+          const { starrable } = addStar || removeStar;
+          // Read Cache Memory
+          const data = cache.readQuery({ query: SEARCH_REPOSITORIES, variables: state.searchReducer });
+          // search > edges > node > id, name, url, viewerHasStarred, stargazers
+          const edges = data.search.edges;
+          // Update Edge -> Star Count
+          const newEdges = edges.map(edge => {
+            if (edge.node.id === node.id) {
+              // Star Count
+              const totalCount = edge.node.stargazers.totalCount;
+              // Star Count Increment or Decrement
+              const diff = starrable.viewerHasStarred ? 1 : -1;
+              // New Star Count
+              const newTotalCount = totalCount + diff;
+              // Update Star Count
+              edge.node.stargazers.totalCount = newTotalCount;
             }
-          ];
+            return edge;
+          })
+          // Update Edges
+          data.search.edges = newEdges;
+          // Write Cache Memory
+          cache.writeQuery({ query: SEARCH_REPOSITORIES, data });
         }
+        // refetchQueries: mutationResult => {
+        //   return [
+        //     {
+        //       query: SEARCH_REPOSITORIES,
+        //       variables: state.searchReducer
+        //     }
+        //   ];
+        // }
       }
     );
 
-    // Star Count & Status Component
+    // Star Mutation Component
     return (
       <>
         {/* Add or Remove Star Button */ }
         <button
+          // Click -> Mutation
           onClick={ () => addOrRemoveStar(
             { variables: { input: { starrableId: id } } }
           ) }
@@ -119,7 +147,7 @@ const App = () => {
     );
   };
 
-  // SearchQuery Component Function
+  // Search Query Component Function
   const SearchQuery = () => {
 
     // useQuery <- GraphQL, Query Variables
@@ -145,7 +173,7 @@ const App = () => {
     // Repository Count Display
     const title = `GitHub Repositories Search Results -> ${ repositoryCount } ${ repositoryUnit }`
 
-    // SearchQuery Component
+    // Search Query Component
     return (
       <>
         <h2>{ title }</h2>
@@ -163,8 +191,8 @@ const App = () => {
                   <li>
                     <a href={ node.url } target="_blank" rel="noopener noreferrer">{ node.name }</a>
                     &nbsp;
-                    {/* Star Count & Status Component */ }
-                    <StarCountAndStatus />
+                    {/* Star Mutation Component */ }
+                    <StarMutation />
                   </li>
                 </SearchQueryContext.Provider>
               );
